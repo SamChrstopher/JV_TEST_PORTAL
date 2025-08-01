@@ -34,6 +34,11 @@ const formatTime = (sec: number) => {
 
 const TestPage = () => {
   const { token, applicantId, attemptId } = useParams();
+  
+  if (applicantId !== undefined) {
+    localStorage.setItem("applicantId", applicantId.toString());
+  }
+
   const dispatch = useDispatch<any>();
   const handle = useFullScreenHandle();
 
