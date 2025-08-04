@@ -17,13 +17,13 @@ const AddQuestions: React.FC = () => {
           </div>
         </button>
 
-        <button className="question-button" onClick={() => navigate('/add-coding')}>
+        {/* <button className="question-button" onClick={() => navigate('/add-coding')}>
           <div className="icon">{`</>`}</div>
           <div>
             <div>Coding</div>
             <div>Questions</div>
           </div>
-        </button>
+        </button> */}
       </div>
     </div>
   );
