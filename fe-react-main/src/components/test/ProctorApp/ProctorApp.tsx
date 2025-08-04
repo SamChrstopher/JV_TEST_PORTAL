@@ -12,6 +12,7 @@ import {
 } from "../../../redux/slices/proctorSlice";
 
 import { type RootState } from "../../../redux/store";
+import MalpracticeTerminated from "./MalpracticeTerminated";
 
 type MyComponentProps = {
   handleFinalSubmit: () => Promise<void>;
@@ -37,18 +38,19 @@ const ProctorApp: React.FC<MyComponentProps> = ({ handleFinalSubmit }) => {
 
   const handleMalpracticeDetected = (): void => {
     if (verificationComplete) {
-      const newCount = malpracticeCount + 1;
+      const newCount = malpracticeCount < 12 ? malpracticeCount + 1 : malpracticeCount;
       dispatch(incrementMalpractice());
 
-      if (newCount >= 5) {
+      if (newCount >= 10) {
         dispatch(
           setAlertMessage("❌ Test terminated due to multiple malpractices.")
         );
         dispatch(setIsTestCompleted(true));
         handleFinalSubmit();
         setTimeout(() => {
-          window.location.href = "about:blank"; // or any exit/thank-you page
-        }, 10000);
+          // window.location.href = "about:blank"; // or any exit/thank-you page
+          return <MalpracticeTerminated />;
+        }, 5000);
       }
     }
   };
@@ -58,7 +60,7 @@ const ProctorApp: React.FC<MyComponentProps> = ({ handleFinalSubmit }) => {
       <div className="main-content">
         {isTestStarted && !isTestCompleted && (
           <div className="violation-count">
-            Violations: {malpracticeCount}/5
+            Violations: {malpracticeCount/2}/5
           </div>
         )}
         <WebcamCapture

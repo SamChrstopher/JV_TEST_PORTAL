@@ -12,6 +12,7 @@ import {
   setIsTestCompleted,
   setMalpracticeCount,
 } from "../../../redux/slices/proctorSlice";
+import MalpracticeTerminated from "./MalpracticeTerminated";
 
 interface WebcamCaptureProps {
   onMalpracticeDetected: (message: string, imageUrl: string) => void;
@@ -328,18 +329,24 @@ const WebcamCapture: React.FC<WebcamCaptureProps> = ({
       );
 
       onMalpracticeDetected(message, res.data.malpracticeImageUrl);
-      dispatch(incrementMalpractice());
-      const newCount = malpracticeCount + 1;
-      if (newCount >= 5) {
-        dispatch(
-          setAlertMessage("❌ Test terminated due to multiple malpractices.")
-        );
-        dispatch(setIsTestCompleted(true));
-        setTimeout(() => {
-          window.location.href = "about:blank";
-        }, 10000);
+
+      if (message == "Multiple faces detected") {
+        dispatch(incrementMalpractice());
       }
-    } catch (error) {
+        const newCount = malpracticeCount < 12 ? malpracticeCount + 1 : malpracticeCount;
+
+        if (newCount >= 10) {
+          dispatch(
+            setAlertMessage("❌ Test terminated due to multiple malpractices.")
+          );
+          dispatch(setIsTestCompleted(true));
+         setTimeout(() => {
+          // window.location.href = "about:blank"; // or any exit/thank-you page
+          return <MalpracticeTerminated />;
+        }, 5000);
+        }
+      }
+    catch (error) {
       console.error(
         "Error reporting malpractice:",
         axios.isAxiosError(error)

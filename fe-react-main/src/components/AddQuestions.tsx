@@ -14,7 +14,8 @@ const AddQuestions: React.FC = () => {
           <div>
             <div>MCQs</div>
             <div>Questions</div>
-          </div>
+          </div>o
+          
         </button>
 
         {/* <button className="question-button" onClick={() => navigate('/add-coding')}>
