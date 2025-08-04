@@ -3,12 +3,12 @@ import "../css/TestPage.css";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useFullScreenHandle } from "react-full-screen";
 import { ToastContainer, toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import ConfirmModal from "../test/ConfirmModal";
 import QuestionBlock from "./QuestionBlock";
 import Sidebar from "./Sidebar";
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
 import {
   fetchTestData,
@@ -174,12 +174,16 @@ const TestPage = () => {
   const answeredCount = questions.filter((q) => q.status === "answered").length;
 
   return (
-    <>
+    <FullScreen handle={handle} className="test-page">
+      {/* <div className="fullscreen-toggle"> */}
+        {/* <button onClick={handle.enter}>Enter Fullscreen</button> */}
+        {/* <button onClick={handle.exit}>Exit Fullscreen</button> */}
+      {/* </div> */}
+      {/* <> */}
       {/* Navbar */}
       <Navbar />
       <Alerts />
-      <ProctorApp 
-      handleFinalSubmit = {handleFinalSubmit}  />
+      <ProctorApp handleFinalSubmit={handleFinalSubmit} />
 
       {/* // Main container */}
       <div className="main-container">
@@ -260,7 +264,8 @@ const TestPage = () => {
           </div>
         )}
       </div>
-    </>
+      {/* </> */}
+    </FullScreen>
   );
 };
 
