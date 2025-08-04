@@ -14,27 +14,33 @@ import {
   fetchTestData,
   submitAnswer,
   skipQuestion,
-  evaluateTest
+  evaluateTest,
 } from "../../redux/slices/test/testThunks";
-import {
-  type RootState
-} from "../../redux/store";
+import { type RootState } from "../../redux/store";
 import {
   setStarted,
   setCurrentIndex,
   setAnswer,
-  decrementTime
+  decrementTime,
 } from "../../redux/slices/test/testSlice";
+import Navbar from "./ProctorApp/Navbar";
+import Alerts from "./ProctorApp/Alerts";
+import ProctorApp from "./ProctorApp/ProctorApp";
 
 const formatTime = (sec: number) => {
-  const m = Math.floor(sec / 60).toString().padStart(2, "0");
+  const m = Math.floor(sec / 60)
+    .toString()
+    .padStart(2, "0");
   const s = (sec % 60).toString().padStart(2, "0");
   return `${m}:${s}`;
 };
 
 const TestPage = () => {
   const { token, applicantId, attemptId } = useParams();
-  
+  const { verificationComplete } = useSelector(
+    (state: RootState) => state.proctor
+  );
+
   if (applicantId !== undefined) {
     localStorage.setItem("applicantId", applicantId.toString());
   }
@@ -53,7 +59,7 @@ const TestPage = () => {
     score,
     timeLeft,
     started,
-    loading
+    loading,
   } = useSelector((state: RootState) => state.test);
 
   useEffect(() => {
@@ -112,7 +118,13 @@ const TestPage = () => {
     }
     if (q.status !== "answered") {
       await dispatch(
-        submitAnswer({ token, applicantId, attemptId, questionId: q.mcq_question.id, selectedOptionId: selected })
+        submitAnswer({
+          token,
+          applicantId,
+          attemptId,
+          questionId: q.mcq_question.id,
+          selectedOptionId: selected,
+        })
       );
     }
     if (currentIndex < questions.length - 1) {
@@ -123,7 +135,14 @@ const TestPage = () => {
   const handleSkip = async () => {
     const q = questions[currentIndex];
     if (q.status === "answered") return;
-    await dispatch(skipQuestion({ token, applicantId, attemptId, questionId: q.mcq_question.id }));
+    await dispatch(
+      skipQuestion({
+        token,
+        applicantId,
+        attemptId,
+        questionId: q.mcq_question.id,
+      })
+    );
     if (currentIndex < questions.length - 1) {
       dispatch(setCurrentIndex(currentIndex + 1));
     }
@@ -140,13 +159,15 @@ const TestPage = () => {
 
   const handleStartTest = async () => {
     try {
-      const data = await dispatch(fetchTestData({ token, applicantId, attemptId })).unwrap();
+      const data = await dispatch(
+        fetchTestData({ token, applicantId, attemptId })
+      ).unwrap();
       handle.enter();
       dispatch(setStarted(true));
 
       toast.info(`Attempts left: ${3 - (data.attemptCount ?? 0)}`);
     } catch (err: any) {
-      toast.error(err || 'Unable to resume test');
+      toast.error(err || "Unable to resume test");
     }
   };
 
@@ -154,10 +175,16 @@ const TestPage = () => {
 
   return (
     <>
+      {/* Navbar */}
+      <Navbar />
+      <Alerts />
+      <ProctorApp 
+      handleFinalSubmit = {handleFinalSubmit}  />
 
       {/* // Main container */}
       <div className="main-container">
-        <ToastContainer position="bottom-left"
+        <ToastContainer
+          position="bottom-left"
           autoClose={3000}
           hideProgressBar={false}
           newestOnTop
@@ -166,13 +193,13 @@ const TestPage = () => {
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          theme="colored" />
+          theme="colored"
+        />
         {loading ? (
           <div className="spinner">Loading test...</div>
         ) : (
           <div className="mcq-test-container">
             {!started && !submitted ? (
-
               // Instructions
               <div className="instructions">
                 <h2>Instructions</h2>
@@ -181,22 +208,20 @@ const TestPage = () => {
                   <li>Test auto-submits after 45 minutes.</li>
                   <li>Each question must be answered or skipped.</li>
                 </ul>
-                <button className="submit-button" onClick={handleStartTest}>
-                  Start Test
-                </button>
+                {verificationComplete && (
+                  <button className="submit-button" onClick={handleStartTest}>
+                    Start Test
+                  </button>
+                )}
               </div>
-
-
-
-
             ) : submitted ? (
-
               //Results
               <div className="result">
                 <h3>Test Completed</h3>
-                <p>Your Score: {score} / {questions.length}</p>
+                <p>
+                  Your Score: {score} / {questions.length}
+                </p>
               </div>
-
             ) : (
               <>
                 {/* //QuestionBlock */}
@@ -209,7 +234,6 @@ const TestPage = () => {
                   handleSkip={handleSkip}
                 />
 
-
                 {/* Side Bar */}
                 <Sidebar
                   questions={questions}
@@ -220,7 +244,6 @@ const TestPage = () => {
                   formatTime={formatTime}
                   setShowConfirmModal={setShowConfirmModal}
                 />
-
 
                 {/* ConfirModal */}
                 {showConfirmModal && (

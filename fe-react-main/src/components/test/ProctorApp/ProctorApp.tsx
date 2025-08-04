@@ -1,12 +1,10 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import WebcamCapture from "./WebcamCapture";
-import Alerts from "./Alerts";
-import "./ProctalApp.css";
+import "./ProctorApp.css";
 
 import {
   setAlertMessage,
-  setCapturedImage,
   setIsTestCompleted,
   setIsTestStarted,
   incrementMalpractice,
@@ -15,19 +13,21 @@ import {
 
 import { type RootState } from "../../../redux/store";
 
-const ProctalApp: React.FC = () => {
+type MyComponentProps = {
+  handleFinalSubmit: () => Promise<void>;
+};
+
+const ProctorApp: React.FC<MyComponentProps> = ({ handleFinalSubmit }) => {
   const dispatch = useDispatch();
 
   const {
-    capturedImage,
-    alertMessage,
     isTestStarted,
     isTestCompleted,
     malpracticeCount,
     verificationComplete,
   } = useSelector((state: RootState) => state.proctor);
 
-  const applicantId = "0d708def-c216-4787-bf21-efb0e2eb91aa";
+  const applicantId = localStorage.getItem("applicantId") || "";
 
   const handleVerificationComplete = (): void => {
     dispatch(setVerificationComplete(true));
@@ -45,7 +45,7 @@ const ProctalApp: React.FC = () => {
           setAlertMessage("❌ Test terminated due to multiple malpractices.")
         );
         dispatch(setIsTestCompleted(true));
-
+        handleFinalSubmit();
         setTimeout(() => {
           window.location.href = "about:blank"; // or any exit/thank-you page
         }, 10000);
@@ -54,21 +54,7 @@ const ProctalApp: React.FC = () => {
   };
 
   return (
-    <div className="app-container">
-      <nav className="navbar">
-        <h2 className="navbar-title">Live Proctoring</h2>
-        <div className="navbar-right">
-          {capturedImage && (
-            <img
-              src={capturedImage}
-              alt="Captured Face"
-              className="captured-image"
-              width={50}
-              height={50}
-            />
-          )}
-        </div>
-      </nav>
+    <div>
       <div className="main-content">
         {isTestStarted && !isTestCompleted && (
           <div className="violation-count">
@@ -83,9 +69,8 @@ const ProctalApp: React.FC = () => {
           applicantId={applicantId}
         />
       </div>
-      <Alerts message={alertMessage} />
     </div>
   );
 };
 
-export default ProctalApp;
+export default ProctorApp;

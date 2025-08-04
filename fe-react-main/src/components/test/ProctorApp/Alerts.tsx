@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import "./Alerts.css"; 
+import "./Alerts.css"; // ✅ Import external CSS
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../redux/store";
 
-interface AlertsProps {
-  message: string;
-}
 
-const Alerts: React.FC<AlertsProps> = ({ message }) => {
+const Alerts: React.FC = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
-
+  const message = useSelector((state: RootState) => state.proctor.alertMessage);
   useEffect(() => {
     if (message) {
       setIsVisible(true);
